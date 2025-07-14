@@ -23,8 +23,8 @@ json GraphSerializer::SerializeAllEvents(std::vector<std::shared_ptr<EventNode>>
 
 json GraphSerializer::SerializeEvent(std::shared_ptr<EventNode>& node) {
     json jEventData = {};
-    for (int i = 0; i < node->children.size(); i++) {
-        jEventData.push_back(SerializeNode(node->children[i]));
+    for (auto& subNode : node->children) {
+        jEventData.push_back(SerializeNode(subNode));
     }
     return jEventData;
 }
@@ -45,8 +45,8 @@ json GraphSerializer::SerializeNode(std::shared_ptr<Node>& node)
         jNodeData["repeat"] = choiceNode->bRepeat;
         jNodeData["options"] = {};
 
-        for (int i = 0; i < choiceNode->children.size(); i++) {
-            jNodeData["options"].push_back(SerializeNode(choiceNode->children[i]));
+        for (auto& option : choiceNode->children) {
+            jNodeData["options"].push_back(SerializeNode(option));
         }
     }
     if (node->nodeType == NodeType::Option) {
@@ -55,8 +55,8 @@ json GraphSerializer::SerializeNode(std::shared_ptr<Node>& node)
         jNodeData["dialogue"] = optionNode->inputText;
         jNodeData["branch"] = {};
 
-        for (int i = 0; i < optionNode->children.size(); i++) {
-            jNodeData["branch"].push_back(SerializeNode(optionNode->children[i]));
+        for (auto& node : optionNode->children) {
+            jNodeData["branch"].push_back(SerializeNode(node));
         }
     }
 
@@ -110,8 +110,8 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
         choiceNode->bRepeat = node_data["repeat"];
         graphWindow->nodeList.push_back(choiceNode);
 
-        for (int i = 0; i < node_data["options"].size(); i++) {
-            LoadNodes(node_data["options"][i], choiceNode);
+        for (auto& option : node_data["options"]) {
+            LoadNodes(option, choiceNode);
         }
 
         finalNode = choiceNode;
@@ -121,8 +121,8 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
         strcpy_s(optionNode->inputText, node_data["dialogue"].get<std::string>().c_str());
         graphWindow->nodeList.push_back(optionNode);
 
-        for (int i = 0; i < node_data["branch"].size(); i++) {
-            LoadNodes(node_data["branch"][i], optionNode);
+        for (auto& node : node_data["branch"]) {
+            LoadNodes(node, optionNode);
         }
 
         finalNode = optionNode;
