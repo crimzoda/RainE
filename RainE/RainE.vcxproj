@@ -133,6 +133,7 @@
     <ClCompile Include="ChoiceNode.cpp" />
     <ClCompile Include="DialogNode.cpp" />
     <ClCompile Include="EventNode.cpp" />
+    <ClCompile Include="FlagCheckNode.cpp" />
     <ClCompile Include="GraphSerializer.cpp" />
     <ClCompile Include="GraphWindow.cpp" />
     <ClCompile Include="imgui\backends\imgui_impl_glfw.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="ChoiceNode.h" />
     <ClInclude Include="DialogNode.h" />
     <ClInclude Include="EventNode.h" />
+    <ClInclude Include="FlagCheckNode.h" />
     <ClInclude Include="GraphSerializer.h" />
     <ClInclude Include="GraphWindow.h" />
     <ClInclude Include="imgui\backends\imgui_impl_glfw.h" />

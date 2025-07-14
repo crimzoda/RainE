@@ -23,12 +23,12 @@ public:
     ~GraphWindow();
     void Update();
     void Show();
-    void Save();
+    void Save(bool bInclPositions = true);
     json SerializeEvent(std::shared_ptr<EventNode>& node);
     json SerializeNode(std::shared_ptr<Node>& node);
     std::shared_ptr<Node> GetNodeFromAttribute(const int& attr);
 
-
+    
     ImNodesEditorContext* context = nullptr;
     std::vector<std::shared_ptr<Node>> nodeList;
     std::vector<std::shared_ptr<EventNode>> eventNodeList;

@@ -6,6 +6,7 @@
 #include "DialogNode.h"
 #include "ChoiceNode.h"
 #include "OptionNode.h"
+#include "FlagCheckNode.h"
 #include "json.hpp"
 #include "json_fwd.hpp"
 #include "GraphSerializer.h"
@@ -67,6 +68,7 @@ void GraphWindow::Show()
             std::shared_ptr<EventNode> eventNode = std::make_shared<EventNode>(NodeType::Event, id, this, ImGui::GetMousePos());
             nodeList.push_back(eventNode);
             eventNodeList.push_back(eventNode);
+            ImNodes::SetNodeScreenSpacePos(id, ImGui::GetMousePos());
         }
         if (ImGui::MenuItem("Add Dialog")) {
             int id = (nodeList.size() > 0) ? nodeList.back()->id + 1 : 1;
@@ -86,8 +88,20 @@ void GraphWindow::Show()
             nodeList.push_back(optionNode);
             ImNodes::SetNodeScreenSpacePos(id, ImGui::GetMousePos());
         }
+        if (ImGui::MenuItem("Add Flag Check")) {
+            int id = (nodeList.size() > 0) ? nodeList.back()->id + 1 : 1;
+            std::shared_ptr<FlagCheckNode> flagCheckNode = std::make_shared<FlagCheckNode>(NodeType::FlagCheck, id, this, ImGui::GetMousePos());
+            nodeList.push_back(flagCheckNode);
+            ImNodes::SetNodeScreenSpacePos(id, ImGui::GetMousePos());
+        }
         if (ImGui::MenuItem("Save [TEST]")) {
             this->Save();
+        }
+        if (ImGui::MenuItem("Save (no editor metadata)")) {
+            /*Sets bInclPositions argument to false
+            bInclPositions dictates whether we are saving metadata (only positions of nodes for now)
+            this is because we only need node positions in the editor not in-game.*/
+            this->Save(false);
         }
 
         ImGui::EndPopup();
@@ -147,11 +161,14 @@ void GraphWindow::Show()
     ImGui::End();
 }
 
-void GraphWindow::Save()
+void GraphWindow::Save(bool bInclPositions)
 {
-    json dataToSave = serializer.SerializeAllEvents(eventNodeList);
+    json dataToSave = serializer.SerializeAllEvents(eventNodeList, bInclPositions);
 
-    std::ofstream file(name);
+    //.rg files to be used by the editor, .json to be used by game
+    std::string file_name = bInclPositions ? name + ".rg" : name + ".json";
+
+    std::ofstream file(file_name);
     file << dataToSave.dump(4);
     file.close();
 }

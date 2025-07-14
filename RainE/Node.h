@@ -9,7 +9,8 @@ enum class NodeType {
     Event,
     Dialog,
     Choice,
-    Option
+    Option,
+    FlagCheck
 };
 
 class Node {

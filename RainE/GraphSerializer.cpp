@@ -7,14 +7,17 @@
 
 using json = nlohmann::json;
 
-json GraphSerializer::SerializeAllEvents(std::vector<std::shared_ptr<EventNode>>& eventNodeList)
+json GraphSerializer::SerializeAllEvents(std::vector<std::shared_ptr<EventNode>>& eventNodeList, bool _bInclPositions)
 {
+    bInclPositions = _bInclPositions;
+
     json j = {};
 
     for (auto& eventNode : eventNodeList) {
         ImVec2 eventNodePos = ImNodes::GetNodeEditorSpacePos(eventNode->id);
         std::string eventName = eventNode->inputText;
-        j[eventName.append('[' + std::to_string(eventNodePos.x) + "," + std::to_string(eventNodePos.y) + "]")] = SerializeEvent(eventNode);
+        std::string metadata = bInclPositions ? '[' + std::to_string(eventNodePos.x) + "," + std::to_string(eventNodePos.y) + "]" : "";
+        j[eventName.append(metadata)] = SerializeEvent(eventNode);
         std::cout << eventName << std::endl;
     }
 
@@ -59,8 +62,20 @@ json GraphSerializer::SerializeNode(std::shared_ptr<Node>& node)
             jNodeData["branch"].push_back(SerializeNode(node));
         }
     }
+    if (node->nodeType == NodeType::FlagCheck) {
+        std::shared_ptr<FlagCheckNode> flagCheckNode = std::dynamic_pointer_cast<FlagCheckNode>(node);
+        jNodeData["type"] = "flag_check";
+        jNodeData["flag"] = flagCheckNode->flagText;
+        jNodeData["condition"] = flagCheckNode->bCondition;
+        jNodeData["branch"] = {};
 
-    jNodeData["pos"] = { ImNodes::GetNodeEditorSpacePos(node->id).x, ImNodes::GetNodeEditorSpacePos(node->id).y };
+        for (auto& node : flagCheckNode->children) {
+            jNodeData["branch"].push_back(SerializeNode(node));
+        }
+    }
+
+    if (bInclPositions)
+        jNodeData["pos"] = { ImNodes::GetNodeEditorSpacePos(node->id).x, ImNodes::GetNodeEditorSpacePos(node->id).y };
 
     return jNodeData;
 }
@@ -126,6 +141,18 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
         }
 
         finalNode = optionNode;
+    }
+    if (node_data["type"] == "flag_check") {
+        std::shared_ptr<FlagCheckNode> flagCheckNode = std::make_shared<FlagCheckNode>(NodeType::Option, id, graphWindow, position);
+        strcpy_s(flagCheckNode->flagText, node_data["flag"].get<std::string>().c_str());
+        flagCheckNode->bCondition = node_data["condition"];
+        graphWindow->nodeList.push_back(flagCheckNode);
+
+        for (auto& node : node_data["branch"]) {
+            LoadNodes(node, flagCheckNode);
+        }
+
+        finalNode = flagCheckNode;
     }
 
     Link link;
