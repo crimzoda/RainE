@@ -155,6 +155,8 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
         finalNode = flagCheckNode;
     }
 
+    parentNode->children.push_back(finalNode);
+
     Link link;
     link.id = graphWindow->links.size() + 1;
     link.start_attr = parentNode->outputPinID;

@@ -45,8 +45,11 @@ void GraphWindow::Show()
     otherwise each nodes starting position will not show*/
     if (bIsLoad) {
         serializer.LoadEvents(name);
+        //Retrieve file name from directory (if directory)
         size_t dirLastPos = name.find_last_of("/\\") + 1;
         name = name.substr(dirLastPos);
+        //Remove file extension (file extension is decided on save not on open)
+        name = name.substr(0, name.find_last_of('.'));
         bIsLoad = false;
     }
 

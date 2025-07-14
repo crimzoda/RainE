@@ -265,12 +265,12 @@ void ShowNewGraphDialog() {
 
 void ShowOpenGraphDialog() {
     ImGui::Begin("Open Graph");
-    static char str0[128] = "";
-    ImGui::InputText("*", str0, IM_ARRAYSIZE(str0));
+    static char fileName[128] = "";
+    ImGui::InputText("*", fileName, IM_ARRAYSIZE(fileName));
 
     if (ImGui::Button("Load")) {
         ImGui::SetNextWindowDockID(mainDockSpaceID, ImGuiCond_Always);
-        std::shared_ptr<GraphWindow> graphWindow = std::make_shared<GraphWindow>(true, str0);
+        std::shared_ptr<GraphWindow> graphWindow = std::make_shared<GraphWindow>(true, fileName);
         graphWindowList.push_back(graphWindow);
         bShowOpenGraphDialog = false;
         printf("[INFO] New Graph created\n");

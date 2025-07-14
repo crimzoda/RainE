@@ -26,6 +26,7 @@ public:
     void Save(bool bInclPositions = true);
     json SerializeEvent(std::shared_ptr<EventNode>& node);
     json SerializeNode(std::shared_ptr<Node>& node);
+
     std::shared_ptr<Node> GetNodeFromAttribute(const int& attr);
 
     
