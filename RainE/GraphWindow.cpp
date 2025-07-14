@@ -168,6 +168,8 @@ std::shared_ptr<Node> GraphWindow::GetNodeFromAttribute(const int& attr)
 }
 
 void GraphWindow::Update() {
+    //Keeping all node lists up to date as well as handling visibility logic
+
     for (int i = 0; i < nodeList.size(); i++) {
         if (nodeList[i]->bShouldDelete && nodeList[i]->linkCount == 0) {
             nodeList.erase(nodeList.begin() + i);

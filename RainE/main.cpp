@@ -272,7 +272,7 @@ void ShowOpenGraphDialog() {
         ImGui::SetNextWindowDockID(mainDockSpaceID, ImGuiCond_Always);
         std::shared_ptr<GraphWindow> graphWindow = std::make_shared<GraphWindow>(true, str0);
         graphWindowList.push_back(graphWindow);
-        bShowNewGraphDialog = false;
+        bShowOpenGraphDialog = false;
         printf("[INFO] New Graph created\n");
     }
 

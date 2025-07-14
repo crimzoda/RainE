@@ -1,8 +1,8 @@
 #include "GraphSerializer.h"
 #include "json.hpp"
 #include "json_fwd.hpp"
-#include <iostream>;
-#include <fstream>;
+#include <iostream>
+#include <fstream>
 
 
 using json = nlohmann::json;
@@ -10,10 +10,11 @@ using json = nlohmann::json;
 json GraphSerializer::SerializeAllEvents(std::vector<std::shared_ptr<EventNode>>& eventNodeList)
 {
     json j = {};
-    for (int i = 0; i < eventNodeList.size(); i++) {
-        ImVec2 eventNodePos = ImNodes::GetNodeEditorSpacePos(eventNodeList[i]->id);
-        std::string eventName = eventNodeList[i]->inputText;
-        j[eventName.append('[' + std::to_string(eventNodePos.x) + "," + std::to_string(eventNodePos.y) + "]")] = SerializeEvent(eventNodeList[i]);
+
+    for (auto& eventNode : eventNodeList) {
+        ImVec2 eventNodePos = ImNodes::GetNodeEditorSpacePos(eventNode->id);
+        std::string eventName = eventNode->inputText;
+        j[eventName.append('[' + std::to_string(eventNodePos.x) + "," + std::to_string(eventNodePos.y) + "]")] = SerializeEvent(eventNode);
         std::cout << eventName << std::endl;
     }
 
@@ -51,6 +52,7 @@ json GraphSerializer::SerializeNode(std::shared_ptr<Node>& node)
     if (node->nodeType == NodeType::Option) {
         std::shared_ptr<OptionNode> optionNode = std::dynamic_pointer_cast<OptionNode>(node);
         jNodeData["type"] = "option";
+        jNodeData["dialogue"] = optionNode->inputText;
         jNodeData["branch"] = {};
 
         for (int i = 0; i < optionNode->children.size(); i++) {
@@ -83,28 +85,29 @@ void GraphSerializer::LoadEvents(std::string filePath)
         graphWindow->nodeList.push_back(eventNode);
         graphWindow->eventNodeList.push_back(eventNode);
 
-        for (int i = 0; i < el.value().size(); i++) {
-            LoadNodes(el.value()[i], eventNode);
+        for (auto& node : el.value()) {
+            LoadNodes(node, eventNode);
         }
     }
 }
 
 void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode) {
     std::shared_ptr<Node> finalNode;
-
+    int id = (graphWindow->nodeList.size() > 0) ? graphWindow->nodeList.back()->id + 1 : 1;
     ImVec2 position = ImVec2(node_data["pos"][0], node_data["pos"][1]);
 
     //TODO: Could probably optimize this, lots of repetition with the id, node creation and nodeList pushes.
     if (node_data["type"] == "dialogue") {
-        int id = (graphWindow->nodeList.size() > 0) ? graphWindow->nodeList.back()->id + 1 : 1;
         std::shared_ptr<DialogNode> dialogNode = std::make_shared<DialogNode>(NodeType::Dialog, id, graphWindow, position);
-        graphWindow->nodeList.push_back(dialogNode);
+        strcpy_s(dialogNode->characterText, node_data["character"].get<std::string>().c_str());
+        strcpy_s(dialogNode->inputText, node_data["dialogue"].get<std::string>().c_str());
 
+        graphWindow->nodeList.push_back(dialogNode);
         finalNode = dialogNode;
     }
     if (node_data["type"] == "choice") {
-        int id = (graphWindow->nodeList.size() > 0) ? graphWindow->nodeList.back()->id + 1 : 1;
         std::shared_ptr<ChoiceNode> choiceNode = std::make_shared<ChoiceNode>(NodeType::Choice, id, graphWindow, position);
+        choiceNode->bRepeat = node_data["repeat"];
         graphWindow->nodeList.push_back(choiceNode);
 
         for (int i = 0; i < node_data["options"].size(); i++) {
@@ -114,8 +117,8 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
         finalNode = choiceNode;
     }
     if (node_data["type"] == "option") {
-        int id = (graphWindow->nodeList.size() > 0) ? graphWindow->nodeList.back()->id + 1 : 1;
         std::shared_ptr<OptionNode> optionNode = std::make_shared<OptionNode>(NodeType::Option, id, graphWindow, position);
+        strcpy_s(optionNode->inputText, node_data["dialogue"].get<std::string>().c_str());
         graphWindow->nodeList.push_back(optionNode);
 
         for (int i = 0; i < node_data["branch"].size(); i++) {
