@@ -35,7 +35,7 @@ public:
     std::vector<std::shared_ptr<Node>> nodeList;
     std::vector<std::shared_ptr<EventNode>> eventNodeList;
     
-    //Ensures unique ID
+    //Ensures unique IDs
     //Previous method of incrementing id of the node at the back did not guarantee this.
     int highestNodeId = 0;
     int highestLinkId = 0;
