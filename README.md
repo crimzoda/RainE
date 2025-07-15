@@ -8,3 +8,5 @@ However, this can be used in any game as the output is JSON.
 * Fully node-based editor
 * Dynamic node linking
 * Optimized JSON export
+* Tabbable editor, work on multiple files at once
+* Graph minimap
