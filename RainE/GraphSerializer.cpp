@@ -88,14 +88,12 @@ void GraphSerializer::LoadEvents(std::string filePath)
     std::cout << data.dump(4);
 
     for (auto& el : data.items()) {
-        int id = (graphWindow->nodeList.size() > 0) ? graphWindow->nodeList.back()->id + 1 : 1;
-
         //Hacky as hell - TODO: refactor to giving event nodes json properties like all other nodes
         std::string position = el.key().substr(el.key().find("["), el.key().find("]"));
         float pos_x = std::stof(position.substr(1, position.find(",")));
         float pos_y = std::stof(position.substr(position.find(",") + 1, position.length()));
 
-        std::shared_ptr<EventNode> eventNode = std::make_shared<EventNode>(NodeType::Event, id, graphWindow, ImVec2(pos_x, pos_y));
+        std::shared_ptr<EventNode> eventNode = std::make_shared<EventNode>(NodeType::Event, graphWindow, ImVec2(pos_x, pos_y));
         strcpy_s(eventNode->inputText, el.key().substr(0, el.key().find_first_of('[')).c_str());
         graphWindow->nodeList.push_back(eventNode);
         graphWindow->eventNodeList.push_back(eventNode);
@@ -108,12 +106,11 @@ void GraphSerializer::LoadEvents(std::string filePath)
 
 void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode) {
     std::shared_ptr<Node> finalNode;
-    int id = (graphWindow->nodeList.size() > 0) ? graphWindow->nodeList.back()->id + 1 : 1;
     ImVec2 position = ImVec2(node_data["pos"][0], node_data["pos"][1]);
 
     //TODO: Could probably optimize this, lots of repetition with the id, node creation and nodeList pushes.
     if (node_data["type"] == "dialogue") {
-        std::shared_ptr<DialogNode> dialogNode = std::make_shared<DialogNode>(NodeType::Dialog, id, graphWindow, position);
+        std::shared_ptr<DialogNode> dialogNode = std::make_shared<DialogNode>(NodeType::Dialog, graphWindow, position);
         strcpy_s(dialogNode->characterText, node_data["character"].get<std::string>().c_str());
         strcpy_s(dialogNode->inputText, node_data["dialogue"].get<std::string>().c_str());
 
@@ -121,7 +118,7 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
         finalNode = dialogNode;
     }
     if (node_data["type"] == "choice") {
-        std::shared_ptr<ChoiceNode> choiceNode = std::make_shared<ChoiceNode>(NodeType::Choice, id, graphWindow, position);
+        std::shared_ptr<ChoiceNode> choiceNode = std::make_shared<ChoiceNode>(NodeType::Choice, graphWindow, position);
         choiceNode->bRepeat = node_data["repeat"];
         graphWindow->nodeList.push_back(choiceNode);
 
@@ -132,7 +129,7 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
         finalNode = choiceNode;
     }
     if (node_data["type"] == "option") {
-        std::shared_ptr<OptionNode> optionNode = std::make_shared<OptionNode>(NodeType::Option, id, graphWindow, position);
+        std::shared_ptr<OptionNode> optionNode = std::make_shared<OptionNode>(NodeType::Option, graphWindow, position);
         strcpy_s(optionNode->inputText, node_data["dialogue"].get<std::string>().c_str());
         graphWindow->nodeList.push_back(optionNode);
 
@@ -143,7 +140,7 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
         finalNode = optionNode;
     }
     if (node_data["type"] == "flag_check") {
-        std::shared_ptr<FlagCheckNode> flagCheckNode = std::make_shared<FlagCheckNode>(NodeType::Option, id, graphWindow, position);
+        std::shared_ptr<FlagCheckNode> flagCheckNode = std::make_shared<FlagCheckNode>(NodeType::Option, graphWindow, position);
         strcpy_s(flagCheckNode->flagText, node_data["flag"].get<std::string>().c_str());
         flagCheckNode->bCondition = node_data["condition"];
         graphWindow->nodeList.push_back(flagCheckNode);
@@ -158,7 +155,8 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
     parentNode->children.push_back(finalNode);
 
     Link link;
-    link.id = graphWindow->links.size() + 1;
+    graphWindow->highestLinkId++;
+    link.id = graphWindow->highestLinkId;
     link.start_attr = parentNode->outputPinID;
     link.end_attr = finalNode->inputPinID;
     graphWindow->links.push_back(link);

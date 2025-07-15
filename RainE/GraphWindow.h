@@ -24,6 +24,7 @@ public:
     void Update();
     void Show();
     void Save(bool bInclPositions = true);
+
     json SerializeEvent(std::shared_ptr<EventNode>& node);
     json SerializeNode(std::shared_ptr<Node>& node);
 
@@ -34,6 +35,10 @@ public:
     std::vector<std::shared_ptr<Node>> nodeList;
     std::vector<std::shared_ptr<EventNode>> eventNodeList;
     
+    //Ensures unique ID
+    //Previous method of incrementing id of the node at the back did not guarantee this.
+    int highestNodeId = 0;
+    int highestLinkId = 0;
 
     std::vector<Link> links;
     int pinCount = 0;
