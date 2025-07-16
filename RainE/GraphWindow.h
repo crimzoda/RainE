@@ -26,11 +26,12 @@ public:
     void Show();
     void Save(bool bInclPositions = true);
 
-    json SerializeEvent(std::shared_ptr<EventNode>& node);
-    json SerializeNode(std::shared_ptr<Node>& node);
-
     GraphSerializer serializer;
 
+    /*std::shared_ptr<Node> GetNodeFromAttribute
+    * Returns the Node linked to the attribute.
+    * Attribute is the connector pins seen on nodes.
+    */
     std::shared_ptr<Node> GetNodeFromAttribute(const int& attr);
 
     

@@ -194,6 +194,7 @@ int main(int, char**)
                 graphWindowList[i]->Show();
             }
             else {
+                //TODO: Consider using std::remove_if instead
                 graphWindowList.erase(graphWindowList.begin() + i);
             }
         }

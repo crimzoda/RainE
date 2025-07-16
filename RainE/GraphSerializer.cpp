@@ -54,6 +54,7 @@ json GraphSerializer::SerializeNode(std::shared_ptr<Node>& node)
         jNodeData["repeat"] = choiceNode->bRepeat;
         jNodeData["options"] = {};
 
+        //Recursively call SerializeNode on all options and store it in 'options' key.
         for (auto& option : choiceNode->children) {
             jNodeData["options"].push_back(SerializeNode(option));
         }
@@ -64,6 +65,7 @@ json GraphSerializer::SerializeNode(std::shared_ptr<Node>& node)
         jNodeData["dialogue"] = optionNode->inputText;
         jNodeData["branch"] = {};
 
+        //Recursively call SerializeNode on all branches and store it in 'branch' key.
         for (auto& node : optionNode->children) {
             jNodeData["branch"].push_back(SerializeNode(node));
         }
@@ -122,7 +124,7 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
     std::shared_ptr<Node> finalNode;
     ImVec2 position = ImVec2(node_data["pos"][0], node_data["pos"][1]);
 
-    //TODO: Could probably optimize this, lots of repetition with the id, node creation and nodeList pushes.
+    //TODO: Could probably optimize this, lots of repetition with node creation and nodeList pushes.
     if (node_data["type"] == "dialogue") {
         std::shared_ptr<DialogNode> dialogNode = std::make_shared<DialogNode>(NodeType::Dialog, graphWindow, position);
         strcpy_s(dialogNode->characterText, node_data["character"].get<std::string>().c_str());
@@ -136,6 +138,7 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
         choiceNode->bRepeat = node_data["repeat"];
         graphWindow->nodeList.push_back(choiceNode);
 
+        //Recursively call LoadNode on all options.
         for (auto& option : node_data["options"]) {
             LoadNodes(option, choiceNode);
         }
@@ -147,6 +150,7 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
         strcpy_s(optionNode->inputText, node_data["dialogue"].get<std::string>().c_str());
         graphWindow->nodeList.push_back(optionNode);
 
+        //Recursively call LoadNode on all branches.
         for (auto& node : node_data["branch"]) {
             LoadNodes(node, optionNode);
         }
@@ -165,6 +169,9 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
 
         finalNode = flagCheckNode;
     }
+
+    //Push this node to its parent node's children vector
+    //Create links based on its parent node
 
     parentNode->children.push_back(finalNode);
 
