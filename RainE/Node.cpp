@@ -3,7 +3,7 @@
 #include "imnodes.h"
 #include "GraphWindow.h"
 
-Node::Node(NodeType _nodeType, GraphWindow* _graphWindow, ImVec2 startPos) : nodeType(_nodeType), graphWindow(_graphWindow) {
+Node::Node(NodeType _nodeType, GraphWindow* _graphWindow, const ImVec2 startPos) : nodeType(_nodeType), graphWindow(_graphWindow) {
     graphWindow->highestNodeId++;
     id = graphWindow->highestNodeId;
     printf("[INFO] Created Node with ID %s\n", std::to_string(id).c_str());

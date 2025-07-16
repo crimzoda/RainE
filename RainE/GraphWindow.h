@@ -20,7 +20,7 @@ struct Link {
 
 class GraphWindow {
 public:
-    GraphWindow(bool _bIsLoad, std::string name);
+    GraphWindow(bool _bIsLoad, const std::string& _name);
     ~GraphWindow();
     void Update();
     void Show();
@@ -32,7 +32,7 @@ public:
     * Returns the Node linked to the attribute.
     * Attribute is the connector pins seen on nodes.
     */
-    std::shared_ptr<Node> GetNodeFromAttribute(const int& attr);
+    std::shared_ptr<Node> GetNodeFromAttribute(const int attr);
 
     
     ImNodesEditorContext* context = nullptr;

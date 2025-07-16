@@ -16,7 +16,7 @@
 
 using json = nlohmann::json;
 
-GraphWindow::GraphWindow(bool _bIsLoad, std::string _name) : bIsLoad(_bIsLoad), name(_name) {
+GraphWindow::GraphWindow(bool _bIsLoad, const std::string& _name) : bIsLoad(_bIsLoad), name(_name) {
     serializer.graphWindow = this;
 
     context = ImNodes::EditorContextCreate();
@@ -33,6 +33,9 @@ void GraphWindow::Show()
     ImGui::SetNextWindowSize(ImVec2(600, 600), ImGuiCond_FirstUseEver);
     ImGui::Begin(this->name.c_str());
     
+    if (ImGui::Button("Close")) {
+        bShouldDelete = true;
+    }
     
     ImNodes::BeginNodeEditor();
 
@@ -168,7 +171,7 @@ void GraphWindow::Save(bool bInclPositions)
     file.close();
 }
 
-std::shared_ptr<Node> GraphWindow::GetNodeFromAttribute(const int& attr)
+std::shared_ptr<Node> GraphWindow::GetNodeFromAttribute(const int attr)
 {
     for (int i = 0; i < nodeList.size(); i++) {
         if (nodeList[i]->inputPinID == attr || nodeList[i]->outputPinID == attr) {

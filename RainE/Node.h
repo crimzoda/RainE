@@ -15,7 +15,7 @@ enum class NodeType {
 
 class Node {
 public:
-    Node(NodeType _nodeType, GraphWindow* _graphWindow, ImVec2 startPos);
+    Node(NodeType _nodeType, GraphWindow* _graphWindow, const ImVec2 startPos);
     virtual void Show();
     void ShowDeleteButton();
 

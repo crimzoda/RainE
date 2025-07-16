@@ -265,7 +265,10 @@ void ShowNewGraphDialog() {
         bShowNewGraphDialog = false;
         printf("[INFO] New Graph created\n");
     }
-
+    ImGui::SameLine();
+    if (ImGui::Button("Close")) {
+        bShowNewGraphDialog = false;
+    }
     ImGui::End();
 }
 
@@ -273,7 +276,6 @@ void ShowOpenGraphDialog() {
     ImGui::Begin("Open Graph");
     static char fileName[128] = "";
     ImGui::InputText("*", fileName, IM_ARRAYSIZE(fileName));
-
     if (ImGui::Button("Load")) {
         ImGui::SetNextWindowDockID(mainDockSpaceID, ImGuiCond_Always);
         std::shared_ptr<GraphWindow> graphWindow = std::make_shared<GraphWindow>(true, fileName);
@@ -281,6 +283,9 @@ void ShowOpenGraphDialog() {
         bShowOpenGraphDialog = false;
         printf("[INFO] New Graph created\n");
     }
-
+    ImGui::SameLine();
+    if (ImGui::Button("Close")) {
+        bShowOpenGraphDialog = false;
+    }
     ImGui::End();
 }
