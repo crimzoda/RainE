@@ -1,6 +1,12 @@
 #include "GraphSerializer.h"
 #include "json.hpp"
-#include "json_fwd.hpp"
+#include "Node.h"
+#include "EventNode.h"
+#include "DialogNode.h"
+#include "ChoiceNode.h"
+#include "OptionNode.h"
+#include "FlagCheckNode.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -80,9 +86,15 @@ json GraphSerializer::SerializeNode(std::shared_ptr<Node>& node)
     return jNodeData;
 }
 
-void GraphSerializer::LoadEvents(std::string filePath)
+bool GraphSerializer::LoadEvents(std::string filePath)
 {
     std::ifstream f(filePath);
+
+    if (!f) {
+        f.close();
+        return false;
+    }
+
     json data = json::parse(f);
 
     std::cout << data.dump(4);
@@ -102,6 +114,8 @@ void GraphSerializer::LoadEvents(std::string filePath)
             LoadNodes(node, eventNode);
         }
     }
+
+    return true;
 }
 
 void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode) {

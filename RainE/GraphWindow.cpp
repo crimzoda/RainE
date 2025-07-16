@@ -8,7 +8,6 @@
 #include "OptionNode.h"
 #include "FlagCheckNode.h"
 #include "json.hpp"
-#include "json_fwd.hpp"
 #include "GraphSerializer.h"
 
 #include <filesystem>
@@ -17,19 +16,15 @@
 
 using json = nlohmann::json;
 
-GraphSerializer serializer;
-
 GraphWindow::GraphWindow(bool _bIsLoad, std::string _name) : bIsLoad(_bIsLoad), name(_name) {
     serializer.graphWindow = this;
 
     context = ImNodes::EditorContextCreate();
-    ImGui::CreateContext();
 }
 
 GraphWindow::~GraphWindow()
 {
     ImNodes::EditorContextFree(context);
-    ImGui::DestroyContext();
 }
 
 void GraphWindow::Show()
@@ -44,7 +39,10 @@ void GraphWindow::Show()
     /*Loading is done between ImGui::Begin() and ImNodes::BeginNodeEditor
     otherwise each nodes starting position will not show*/
     if (bIsLoad) {
-        serializer.LoadEvents(name);
+        if (!serializer.LoadEvents(name)) {
+            bShouldDelete = true;
+        }
+            
         //Retrieve file name from directory (if directory)
         size_t dirLastPos = name.find_last_of("/\\") + 1;
         name = name.substr(dirLastPos);
@@ -163,7 +161,10 @@ void GraphWindow::Save(bool bInclPositions)
     std::string file_name = bInclPositions ? name + ".rg" : name + ".json";
 
     std::ofstream file(file_name);
-    file << dataToSave.dump(4);
+
+    if (!file) {
+        file << dataToSave.dump(4);
+    }
     file.close();
 }
 

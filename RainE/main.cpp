@@ -190,7 +190,12 @@ int main(int, char**)
         }
 
         for (int i = 0; i < graphWindowList.size(); i++) {
-            graphWindowList[i]->Show();
+            if (!graphWindowList[i]->bShouldDelete) {
+                graphWindowList[i]->Show();
+            }
+            else {
+                graphWindowList.erase(graphWindowList.begin() + i);
+            }
         }
 
         // Rendering

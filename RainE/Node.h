@@ -20,8 +20,10 @@ public:
     void ShowDeleteButton();
 
     NodeType nodeType;
+    //Used for up to date referencing of pinCount member variable of graphWindow
     GraphWindow* graphWindow;
 
+    //Stores child nodes, useful for looping through when saving and loading
     std::vector<std::shared_ptr<Node>> children;
 
     int linkCount = 0;

@@ -1,11 +1,14 @@
 #pragma once
+#include "json_fwd.hpp"
+
 #include <vector>
 #include <memory>
-#include "EventNode.h"
-#include "DialogNode.h"
-#include "ChoiceNode.h"
-#include "OptionNode.h"
-#include "FlagCheckNode.h"
+
+class Node;
+class EventNode;
+class GraphWindow;
+
+using json = nlohmann::json;
 
 class GraphSerializer
 {
@@ -17,7 +20,7 @@ public:
     GraphWindow* graphWindow;
     bool bInclPositions;
 
-    void LoadEvents(std::string filePath);
+    bool LoadEvents(std::string filePath);
     void LoadNodes(json node_data, std::shared_ptr<Node> parentNode);
 };
 

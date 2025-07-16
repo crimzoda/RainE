@@ -1,15 +1,16 @@
 #pragma once
+#include "imnodes.h"
+#include "json_fwd.hpp"
+#include "GraphSerializer.h"
+
 #include <memory>
 #include <vector>
 #include <string>
-#include "imnodes.h"
-#include "json.hpp"
-#include "json_fwd.hpp"
+
+class Node;
+class EventNode;
 
 using json = nlohmann::json;
-
-class EventNode;
-class Node;
 
 struct Link {
     int id;
@@ -28,6 +29,8 @@ public:
     json SerializeEvent(std::shared_ptr<EventNode>& node);
     json SerializeNode(std::shared_ptr<Node>& node);
 
+    GraphSerializer serializer;
+
     std::shared_ptr<Node> GetNodeFromAttribute(const int& attr);
 
     
@@ -45,4 +48,5 @@ public:
     std::string name;
 
     bool bIsLoad;
+    bool bShouldDelete = false;
 };
