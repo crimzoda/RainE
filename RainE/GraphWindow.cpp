@@ -162,7 +162,7 @@ void GraphWindow::Save(bool bInclPositions)
 
     std::ofstream file(file_name);
 
-    if (!file) {
+    if (file) {
         file << dataToSave.dump(4);
     }
     file.close();
