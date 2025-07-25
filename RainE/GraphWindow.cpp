@@ -6,6 +6,7 @@
 #include "DialogNode.h"
 #include "ChoiceNode.h"
 #include "OptionNode.h"
+#include "CharacterListNode.h"
 #include "FlagCheckNode.h"
 #include "json.hpp"
 #include "GraphSerializer.h"
@@ -18,8 +19,10 @@ using json = nlohmann::json;
 
 GraphWindow::GraphWindow(bool _bIsLoad, const std::string& _name) : bIsLoad(_bIsLoad), name(_name) {
     serializer.graphWindow = this;
-
     context = ImNodes::EditorContextCreate();
+    //Node constructor startPos argument does nothing here because SetNodeScreenSpacePos works only after NodeEditor begins.
+    std::shared_ptr<CharacterListNode> characterListNode = std::make_shared<CharacterListNode>(NodeType::CharacterList, this, ImVec2(0, 0));
+    nodeList.push_back(characterListNode);
 }
 
 GraphWindow::~GraphWindow()
@@ -36,7 +39,7 @@ void GraphWindow::Show()
     if (ImGui::Button("Close")) {
         bShouldDelete = true;
     }
-    
+
     ImNodes::BeginNodeEditor();
 
     /*Loading is done between ImGui::Begin() and ImNodes::BeginNodeEditor
@@ -88,10 +91,10 @@ void GraphWindow::Show()
             std::shared_ptr<FlagCheckNode> flagCheckNode = std::make_shared<FlagCheckNode>(NodeType::FlagCheck, this, ImGui::GetMousePos());
             nodeList.push_back(flagCheckNode);
         }
-        if (ImGui::MenuItem("Save [TEST]")) {
+        if (ImGui::MenuItem("Save")) {
             this->Save();
         }
-        if (ImGui::MenuItem("Save (no editor metadata)")) {
+        if (ImGui::MenuItem("Save as JSON")) {
             /*Sets bInclPositions argument to false
             bInclPositions dictates whether we are saving metadata (only positions of nodes for now)
             This is because we only need node positions in the editor not in-game.*/
@@ -156,12 +159,12 @@ void GraphWindow::Show()
     ImGui::End();
 }
 
-void GraphWindow::Save(bool bInclPositions)
+void GraphWindow::Save(bool bIsEditorSave)
 {
-    json dataToSave = serializer.SerializeAllEvents(eventNodeList, bInclPositions);
+    json dataToSave = serializer.SerializeAllEvents(eventNodeList, bIsEditorSave);
 
     //.rg files to be used by the editor, .json to be used by game
-    std::string file_name = bInclPositions ? name + ".rg" : name + ".json";
+    std::string file_name = bIsEditorSave ? name + ".rg" : name + ".json";
 
     std::ofstream file(file_name);
 

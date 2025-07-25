@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CharacterListNode.cpp" />
     <ClCompile Include="ChoiceNode.cpp" />
     <ClCompile Include="DialogNode.cpp" />
     <ClCompile Include="EventNode.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="OptionNode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CharacterListNode.h" />
     <ClInclude Include="ChoiceNode.h" />
     <ClInclude Include="DialogNode.h" />
     <ClInclude Include="EventNode.h" />

@@ -10,11 +10,17 @@ void DialogNode::Show()
     ImNodes::EndNodeTitleBar();
     ImGui::PushItemWidth(150);
     ImGui::Text("Character:");
-    ImGui::InputText("##Input", characterText, IM_ARRAYSIZE(characterText));
+    std::vector<const char*> _characterList;
+    _characterList.reserve(graphWindow->characterList.size());
+
+    for (const auto& _name : graphWindow->characterList) {
+        _characterList.push_back(_name.c_str());
+    }
+
+    ImGui::Combo("##Combo", &currentSelected, _characterList.data(), _characterList.size());
     ImGui::Text("Dialog:");
     ImGui::InputTextMultiline("##Input1", inputText, IM_ARRAYSIZE(inputText));
     ImGui::PopItemWidth();
-
     ImNodes::BeginInputAttribute(inputPinID);
     ImNodes::EndInputAttribute();
 

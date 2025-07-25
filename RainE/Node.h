@@ -10,7 +10,8 @@ enum class NodeType {
     Dialog,
     Choice,
     Option,
-    FlagCheck
+    FlagCheck,
+    CharacterList
 };
 
 class Node {

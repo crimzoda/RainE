@@ -13,17 +13,30 @@
 
 using json = nlohmann::json;
 
-json GraphSerializer::SerializeAllEvents(std::vector<std::shared_ptr<EventNode>>& eventNodeList, bool _bInclPositions)
+json GraphSerializer::SerializeAllEvents(std::vector<std::shared_ptr<EventNode>>& eventNodeList, bool _bIsEditorSave)
 {
-    bInclPositions = _bInclPositions;
+    bIsEditorSave = _bIsEditorSave;
 
     json j = {};
+
+    if (bIsEditorSave) {
+        j["characters"] = graphWindow->characterList;
+    }
+    
 
     for (auto& eventNode : eventNodeList) {
         ImVec2 eventNodePos = ImNodes::GetNodeEditorSpacePos(eventNode->id);
         std::string eventName = eventNode->inputText;
-        std::string metadata = bInclPositions ? '[' + std::to_string(eventNodePos.x) + "," + std::to_string(eventNodePos.y) + "]" : "";
-        j[eventName.append(metadata)] = SerializeEvent(eventNode);
+        std::string metadata = bIsEditorSave ? '[' + std::to_string(eventNodePos.x) + "," + std::to_string(eventNodePos.y) + "]" : "";
+        eventName += metadata;
+        auto serializedEvent = SerializeEvent(eventNode);
+        if (bIsEditorSave) {
+            j["events"][eventName] = serializedEvent;
+        }
+        else {
+            j[eventName] = serializedEvent;
+        }
+        
         std::cout << eventName << std::endl;
     }
 
@@ -45,7 +58,12 @@ json GraphSerializer::SerializeNode(std::shared_ptr<Node>& node)
     if (node->nodeType == NodeType::Dialog) {
         std::shared_ptr<DialogNode> dialogNode = std::dynamic_pointer_cast<DialogNode>(node);
         jNodeData["type"] = "dialogue";
-        jNodeData["character"] = dialogNode->characterText;
+        if (bIsEditorSave) {
+            jNodeData["character"] = dialogNode->currentSelected;
+        }
+        else {
+            jNodeData["character"] = graphWindow->characterList[dialogNode->currentSelected];
+        }
         jNodeData["dialogue"] = dialogNode->inputText;
     }
     if (node->nodeType == NodeType::Choice) {
@@ -82,7 +100,7 @@ json GraphSerializer::SerializeNode(std::shared_ptr<Node>& node)
         }
     }
 
-    if (bInclPositions)
+    if (bIsEditorSave)
         jNodeData["pos"] = { ImNodes::GetNodeEditorSpacePos(node->id).x, ImNodes::GetNodeEditorSpacePos(node->id).y };
 
     return jNodeData;
@@ -101,7 +119,9 @@ bool GraphSerializer::LoadEvents(std::string filePath)
 
     std::cout << data.dump(4);
 
-    for (auto& el : data.items()) {
+    graphWindow->characterList = data["characters"];
+
+    for (auto& el : data["events"].items()) {
         //Hacky as hell - TODO: refactor to giving event nodes json properties like all other nodes
         std::string position = el.key().substr(el.key().find("["), el.key().find("]"));
         float pos_x = std::stof(position.substr(1, position.find(",")));
@@ -127,7 +147,7 @@ void GraphSerializer::LoadNodes(json node_data, std::shared_ptr<Node> parentNode
     //TODO: Could probably optimize this, lots of repetition with node creation and nodeList pushes.
     if (node_data["type"] == "dialogue") {
         std::shared_ptr<DialogNode> dialogNode = std::make_shared<DialogNode>(NodeType::Dialog, graphWindow, position);
-        strcpy_s(dialogNode->characterText, node_data["character"].get<std::string>().c_str());
+        dialogNode->currentSelected = node_data["character"];
         strcpy_s(dialogNode->inputText, node_data["dialogue"].get<std::string>().c_str());
 
         graphWindow->nodeList.push_back(dialogNode);

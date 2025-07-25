@@ -7,4 +7,5 @@ public:
     void Show();
     char characterText[128] = "";
     char inputText[128] = "";
+    int currentSelected = 0;
 };

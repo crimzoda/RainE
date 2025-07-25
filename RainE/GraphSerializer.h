@@ -17,7 +17,7 @@ public:
     * Returns the json data from ALL EventNodes.
     * This function recursively calls SerializeEvent on each EventNode.
     */
-    json SerializeAllEvents(std::vector<std::shared_ptr<EventNode>>& eventNodeList, bool _bInclPositions);
+    json SerializeAllEvents(std::vector<std::shared_ptr<EventNode>>& eventNodeList, bool _bIsEditorSave);
     /*json SerializeEvent
     * Returns the json data taken from a specific EventNode.
     * This function recursively calls SerializeNode on each EventNode's children.
@@ -29,7 +29,7 @@ public:
     json SerializeNode(std::shared_ptr<Node>& node);
 
     GraphWindow* graphWindow;
-    bool bInclPositions;
+    bool bIsEditorSave;
 
     /*bool LoadEvents
     * Instantiates EventNodes based on the top-level of the json data.

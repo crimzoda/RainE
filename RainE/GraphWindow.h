@@ -26,6 +26,8 @@ public:
     void Show();
     void Save(bool bInclPositions = true);
 
+    std::string name;
+
     GraphSerializer serializer;
 
     /*std::shared_ptr<Node> GetNodeFromAttribute
@@ -46,7 +48,8 @@ public:
 
     std::vector<Link> links;
     int pinCount = 0;
-    std::string name;
+    
+    std::vector<std::string> characterList;
 
     bool bIsLoad;
     bool bShouldDelete = false;
